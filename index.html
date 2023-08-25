@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body {
+        height: 100vh;
+        width: 100vw;
+    }
+  #canvas {
+    border: 1px solid black;
+    height: 100%;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext("2d");
+  let isDrawing = false;
+
+
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const backingStoreRatio = context.webkitBackingStorePixelRatio ||
+                            context.mozBackingStorePixelRatio ||
+                            context.msBackingStorePixelRatio ||
+                            context.oBackingStorePixelRatio ||
+                            context.backingStorePixelRatio || 1;
+
+    const ratio = devicePixelRatio/backingStoreRatio;
+    console.log(ratio)
+
+
+  canvas.height = canvas.offsetHeight * ratio;
+  canvas.width = canvas.offsetWidth * ratio;
+
+  context.scale(ratio, ratio);
+
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseout", stopDrawing);
+
+  canvas.addEventListener("touchstart", startDrawingTouch);
+  canvas.addEventListener("touchmove", drawTouch);
+  canvas.addEventListener("touchend", stopDrawing);
+
+  function startDrawing(event) {
+    isDrawing = true;
+    context.beginPath();
+    context.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+  }
+
+  function startDrawingTouch(event) {
+    const touch = event.touches[0];
+    isDrawing = true;
+    context.beginPath();
+    context.moveTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
+    event.preventDefault();
+  }
+
+  function drawTouch(event) {
+    if (!isDrawing) return;
+    const touch = event.touches[0];
+    context.lineTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
+    context.stroke();
+    event.preventDefault();
+  }
+
+  function draw(event) {
+    if (!isDrawing) return;
+    context.lineWidth = 10;
+    context.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    context.stroke();
+  }
+
+  function stopDrawing() {
+    isDrawing = false;
+  }
+</script>
+
+</body>
+</html>
